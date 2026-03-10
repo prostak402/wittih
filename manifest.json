@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "CS2 Pattern Tier Helper",
+  "version": "2.0.0",
+  "description": "Shows rare pattern tiers on market.csgo.com and syncs scan profiles to a local CS2 deal scanner agent.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "notifications",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://market.csgo.com/*",
+    "https://api.lis-skins.com/*",
+    "https://*.lis-skins.com/*",
+    "https://api.telegram.org/*",
+    "http://127.0.0.1/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://market.csgo.com/*"
+      ],
+      "js": [
+        "contentScript.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "128": "icon128.png"
+  },
+  "options_page": "options.html"
+}

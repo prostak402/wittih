@@ -1,0 +1,15 @@
+﻿{
+  "name": "cs2-rare-pattern-scanner",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Local agent for the CS2 rare pattern browser extension.",
+  "main": "agent/server.js",
+  "scripts": {
+    "start": "node agent/server.js",
+    "test": "node --test --test-isolation=none"
+  },
+  "dependencies": {
+    "ws": "^8.18.3"
+  }
+}
+

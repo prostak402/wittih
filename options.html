@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>CS2 Rare Pattern Scanner</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0d1016;
+      --panel: #151b25;
+      --panel-alt: #1a2230;
+      --line: #263247;
+      --text: #f2f5f9;
+      --muted: #9aa8bc;
+      --accent: #6ee7b7;
+      --accent-strong: #0ea5a1;
+      --danger: #fb7185;
+      --warning: #fbbf24;
+      --info: #60a5fa;
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-width: 1080px;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(14, 165, 161, 0.16), transparent 24%),
+        radial-gradient(circle at top left, rgba(96, 165, 250, 0.12), transparent 22%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    .shell {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      letter-spacing: 0.02em;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 760px;
+      line-height: 1.5;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(120px, 1fr));
+      gap: 10px;
+      min-width: 360px;
+    }
+
+    .summary-card,
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)), var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .summary-card {
+      padding: 14px 16px;
+    }
+
+    .summary-card strong {
+      display: block;
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+
+    .summary-card span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tab-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn,
+    button,
+    .file-trigger {
+      appearance: none;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 10px 16px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      font-size: 14px;
+      transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .tab-btn.active,
+    button.primary,
+    .file-trigger.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #081015;
+      font-weight: 700;
+    }
+
+    button.secondary,
+    .file-trigger.secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    button.danger {
+      background: rgba(251, 113, 133, 0.12);
+      color: #ffd7de;
+      border-color: rgba(251, 113, 133, 0.3);
+    }
+
+    button.warning {
+      background: rgba(251, 191, 36, 0.14);
+      color: #fff0c7;
+      border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    button.small {
+      padding: 7px 12px;
+      font-size: 12px;
+    }
+
+    button:hover,
+    .file-trigger:hover,
+    .tab-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: default;
+      transform: none;
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+      animation: fade-in 160ms ease;
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid.patterns,
+    .grid.profiles {
+      grid-template-columns: 320px minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .grid.integrations,
+    .grid.monitor {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    .span-two {
+      grid-column: 1 / -1;
+    }
+
+    .card {
+      padding: 18px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .card p,
+    .small-note {
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 13px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="url"],
+    input[type="password"],
+    select,
+    textarea {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(8, 12, 18, 0.8);
+      color: var(--text);
+      padding: 11px 12px;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    select[multiple],
+    .list-select {
+      min-height: 320px;
+    }
+
+    .status-line {
+      min-height: 22px;
+      margin-bottom: 12px;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .status-line.error {
+      color: var(--danger);
+    }
+
+    .checkbox-grid,
+    .monitor-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .status-badge {
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .status-badge.ok {
+      color: #c2ffe8;
+      border-color: rgba(110, 231, 183, 0.35);
+      background: rgba(110, 231, 183, 0.12);
+    }
+
+    .status-badge.warn {
+      color: #ffe5a6;
+      border-color: rgba(251, 191, 36, 0.35);
+      background: rgba(251, 191, 36, 0.12);
+    }
+
+    .status-badge.err {
+      color: #ffd5db;
+      border-color: rgba(251, 113, 133, 0.35);
+      background: rgba(251, 113, 133, 0.12);
+    }
+
+    .checkbox-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+      font-size: 13px;
+      margin: 0;
+    }
+
+    .checkbox-item input {
+      width: auto;
+      margin: 0;
+    }
+
+    .tier-row,
+    .event-card,
+    .monitor-card,
+    .log-card {
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: var(--panel-alt);
+      padding: 14px;
+    }
+
+    .tier-row-header,
+    .inline-row,
+    .monitor-row,
+    .event-row,
+    .log-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .inline-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .inline-grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .events,
+    .logs {
+      display: grid;
+      gap: 10px;
+      max-height: 720px;
+      overflow: auto;
+      padding-right: 6px;
+    }
+
+    .event-card strong,
+    .log-card strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .event-meta,
+    .log-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .log-details {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(8, 12, 18, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      overflow: auto;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      color: #d6e2f2;
+    }
+
+    .log-level {
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .log-level.info {
+      color: #c2ffe8;
+    }
+
+    .log-level.warn {
+      color: #ffe5a6;
+    }
+
+    .log-level.error {
+      color: #ffd5db;
+    }
+
+    .log-level.debug {
+      color: #b8deff;
+    }
+
+    .link-list {
+      display: grid;
+      gap: 8px;
+      max-height: 260px;
+      overflow: auto;
+    }
+
+    .skin-link {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .skin-link a,
+    .event-card a {
+      color: #bfe5ff;
+      text-decoration: none;
+    }
+
+    .skin-link a:hover,
+    .event-card a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 1280px) {
+      body {
+        min-width: 960px;
+      }
+
+      .grid.integrations,
+      .grid.monitor {
+        grid-template-columns: 1fr;
+      }
+
+      .span-two {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="hero">
+      <div>
+        <h1>CS2 Rare Pattern Scanner</h1>
+        <p>
+          База редких паттернов остаётся источником правды для helper на market.csgo.com,
+          а локальный агент сканирует подключённые маркеты, фильтрует сделки по tier и лимиту цены,
+          затем отправляет события в браузер и Telegram.
+        </p>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <strong id="summary-skins">0</strong>
+          <span>Скинов в базе</span>
+        </div>
+        <div class="summary-card">
+          <strong id="summary-profiles">0</strong>
+          <span>Профилей сканирования</span>
+        </div>
+        <div class="summary-card">
+          <strong id="summary-markets">2</strong>
+          <span>Маркетплейса</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="patterns">База паттернов</button>
+      <button class="tab-btn" data-tab="profiles">Профили сканирования</button>
+      <button class="tab-btn" data-tab="integrations">Интеграции</button>
+      <button class="tab-btn" data-tab="monitor">Монитор</button>
+    </div>
+
+    <div id="status-line" class="status-line"></div>
+
+    <section id="view-patterns" class="view active">
+      <div class="grid patterns">
+        <div class="card stack">
+          <div>
+            <h2>Скины и импорт</h2>
+            <p class="small-note">Поиск по базе, быстрые переходы, импорт и экспорт tier-правил.</p>
+          </div>
+          <label>
+            Поиск по имени
+            <input id="skin-search" type="text" placeholder="Например, Bayonet | Case Hardened">
+          </label>
+          <label>
+            Сохранённые скины
+            <select id="skin-select" class="list-select" size="14"></select>
+          </label>
+          <div class="actions">
+            <button id="new-skin" class="secondary">Новый скин</button>
+            <button id="open-all" class="secondary">Открыть все</button>
+          </div>
+          <div class="actions">
+            <button id="export-skins" class="secondary">Export JSON</button>
+            <label for="import-skins" class="file-trigger secondary">Import JSON</label>
+            <input id="import-skins" type="file" accept="application/json">
+          </div>
+          <div>
+            <h3>Ссылки</h3>
+            <div id="links-list" class="link-list"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Редактор tiers</h2>
+          <p class="small-note">Каждый tier содержит список pattern ID. Эти tier’ы будут использоваться и на странице маркета, и в автоматическом сканере.</p>
+          <label>
+            URL страницы скина
+            <input id="skin-url" type="url" placeholder="https://market.csgo.com/ru/...">
+          </label>
+          <label>
+            Имя скина
+            <input id="skin-name" type="text" placeholder="★ Bayonet | Case Hardened">
+          </label>
+          <div class="inline-row">
+            <h3>Tier-лист</h3>
+            <button id="add-tier" class="secondary">Добавить tier</button>
+          </div>
+          <div id="tiers-container" class="stack"></div>
+          <div class="actions">
+            <button id="save-skin" class="primary">Сохранить скин</button>
+            <button id="delete-skin" class="danger">Удалить скин</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-profiles" class="view">
+      <div class="grid profiles">
+        <div class="card stack">
+          <div>
+            <h2>Профили</h2>
+            <p class="small-note">Профиль определяет, какие скины, качества и tier’ы сканировать на выбранных маркетах.</p>
+          </div>
+          <label>
+            Профили сканирования
+            <select id="profile-select" class="list-select" size="14"></select>
+          </label>
+          <div class="actions">
+            <button id="new-profile" class="secondary">Новый профиль</button>
+            <button id="delete-profile" class="danger">Удалить профиль</button>
+          </div>
+        </div>
+
+        <div class="card stack">
+          <div class="inline-grid">
+            <label>
+              Название профиля
+              <input id="profile-name" type="text" placeholder="Blue Gem hunt">
+            </label>
+            <label>
+              Скин
+              <select id="profile-skin"></select>
+            </label>
+          </div>
+
+          <label class="checkbox-item">
+            <input id="profile-enabled" type="checkbox" checked>
+            Профиль активен
+          </label>
+
+          <div>
+            <h3>Маркетплейсы</h3>
+            <div id="profile-markets" class="checkbox-grid"></div>
+          </div>
+
+          <div>
+            <h3>Tier’ы</h3>
+            <div id="profile-tiers" class="checkbox-grid"></div>
+          </div>
+
+          <div>
+            <h3>Качества</h3>
+            <div id="profile-qualities" class="checkbox-grid"></div>
+          </div>
+
+          <div class="inline-grid three">
+            <label>
+              Макс. цена покупки
+              <input id="profile-max-price" type="number" min="0" step="0.01" placeholder="0.00">
+            </label>
+            <label>
+              Валюта
+              <select id="profile-currency">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="RUB">RUB</option>
+              </select>
+            </label>
+            <label>
+              Интервал сканирования (сек)
+              <input id="profile-cooldown" type="number" min="10" max="300" step="1" value="30">
+            </label>
+          </div>
+
+          <label>
+            Заметки
+            <textarea id="profile-notes" placeholder="Например, только для ручной перепроверки Tier 1-2."></textarea>
+          </label>
+
+          <div class="actions">
+            <button id="save-profile" class="primary">Сохранить профиль</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-integrations" class="view">
+      <div class="grid integrations">
+        <div class="card stack">
+          <div>
+            <h2>Локальный агент и ритм запросов</h2>
+            <p class="small-note">Расширение синхронизирует конфиг с локальным Node.js-агентом. Ниже можно управлять безопасной задержкой между API-запросами к каждому маркету.</p>
+          </div>
+          <label>
+            Agent base URL
+            <input id="agent-base-url" type="url" placeholder="http://127.0.0.1:37891">
+          </label>
+          <label class="checkbox-item">
+            <input id="browser-push-enabled" type="checkbox" checked>
+            Browser push уведомления
+          </label>
+          <label class="checkbox-item">
+            <input id="http-trace-enabled" type="checkbox">
+            Detailed HTTP trace in runtime log
+          </label>
+          <p class="small-note">When enabled, the monitor log will store provider HTTP requests and responses. API keys stay redacted.</p>
+          <div class="inline-grid">
+            <label>
+              Market.csgo.tm delay (ms)
+              <input id="market-request-delay" type="number" min="100" step="50" placeholder="300">
+            </label>
+            <label>
+              LIS-SKINS delay (ms)
+              <input id="lis-request-delay" type="number" min="100" step="50" placeholder="350">
+            </label>
+          </div>
+          <p class="small-note">По умолчанию: 300 ms для Market.csgo.tm и 350 ms для LIS-SKINS. Уменьшение интервала может привести к 429/rate limit.</p>
+          <div class="actions">
+            <button id="save-integrations" class="primary">Сохранить и синхронизировать</button>
+            <button id="test-agent" class="secondary">Проверить agent</button>
+          </div>
+        </div>
+
+        <div class="card stack">
+          <div>
+            <h2>Ключи и Telegram</h2>
+            <p class="small-note">API-ключи остаются локально: расширение хранит их в своём storage и передаёт агенту при sync. Для Market.csgo.tm ключ необязателен, если scanner работает через full-export read-only API.</p>
+          </div>
+          <label>
+            Market.csgo.tm API key (optional)
+            <input id="market-api-key" type="password" placeholder="market.csgo.tm key">
+          </label>
+          <label>
+            LIS-SKINS API key
+            <input id="lis-api-key" type="password" placeholder="LIS-SKINS key">
+          </label>
+          <label class="checkbox-item">
+            <input id="telegram-enabled" type="checkbox">
+            Telegram уведомления
+          </label>
+          <div class="inline-grid">
+            <label>
+              Telegram bot token
+              <input id="telegram-bot-token" type="password" placeholder="123456:ABC...">
+            </label>
+            <label>
+              Telegram chat id
+              <input id="telegram-chat-id" type="text" placeholder="-1001234567890">
+            </label>
+          </div>
+          <div class="actions">
+            <button id="test-notification" class="secondary">Тест уведомления</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-monitor" class="view">
+      <div class="grid monitor">
+        <div class="card stack">
+          <div>
+            <h2>Статус агента</h2>
+            <p class="small-note">Текущая связность, реальный статус сканера, последние циклы и состояние потокового канала событий.</p>
+          </div>
+          <div class="monitor-stats">
+            <span id="monitor-connected" class="status-badge warn">disconnected</span>
+            <span id="monitor-config" class="status-badge warn">not_synced</span>
+            <span id="monitor-stream" class="status-badge warn">stream_offline</span>
+            <span id="monitor-scanner" class="status-badge warn">scanner_unknown</span>
+          </div>
+          <div id="monitor-summary" class="monitor-card stack">
+            <div class="monitor-row"><span class="muted">Agent started</span><strong id="agent-started">—</strong></div>
+            <div class="monitor-row"><span class="muted">Last scan start</span><strong id="scan-started">—</strong></div>
+            <div class="monitor-row"><span class="muted">Last scan finish</span><strong id="scan-finished">—</strong></div>
+            <div class="monitor-row"><span class="muted">Last scan summary</span><strong id="scan-summary">—</strong></div>
+            <div class="monitor-row"><span class="muted">Last sync error</span><strong id="monitor-error">—</strong></div>
+          </div>
+          <div>
+            <h3>Провайдеры</h3>
+            <div id="provider-statuses" class="stack"></div>
+          </div>
+          <div class="actions">
+            <button id="refresh-status" class="secondary">Обновить</button>
+            <button id="sync-config" class="secondary">Sync config</button>
+            <button id="scan-now" class="primary">Scan now</button>
+            <button id="toggle-scan" class="warning">Stop scan</button>
+          </div>
+        </div>
+
+        <div class="card stack">
+          <div class="inline-row">
+            <div>
+              <h2>Журнал находок</h2>
+              <p class="small-note">События от агента. Каждую запись можно открыть или удалить из журнала.</p>
+            </div>
+            <button id="clear-events" class="danger small">Очистить журнал</button>
+          </div>
+          <div id="events-list" class="events"></div>
+        </div>
+
+        <div class="card stack span-two">
+          <div>
+            <h2>Runtime log</h2>
+            <p class="small-note">Default view shows provider request logs, responses, and errors. Enable Detailed HTTP trace to include full request/response payloads.</p>
+          </div>
+          <label class="checkbox-item">
+            <input id="log-http-only" type="checkbox">
+            Show all runtime logs
+          </label>
+          <div id="logs-list" class="logs"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="shared/cs2-scanner-core.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

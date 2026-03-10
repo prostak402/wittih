@@ -69,8 +69,8 @@ test('stores skinBaseName without star and builds separate market/lis names', ()
 
   assert.equal(state.patternLibrary.skins[skinKey].skinBaseName, 'Karambit | Doppler');
   assert.deepEqual(core.buildLisSearchNamesForProfile(state.patternLibrary, profile), [
-    'Karambit | Doppler (Phase 3) (Factory New)',
-    'Karambit | Doppler (Phase 3) (Minimal Wear)'
+    '\u2605 Karambit | Doppler (Phase 3) (Factory New)',
+    '\u2605 Karambit | Doppler (Phase 3) (Minimal Wear)'
   ]);
   assert.deepEqual(core.buildMarketHashNamesForProfile(state.patternLibrary, profile), [
     '\u2605 Karambit | Doppler (Phase 3) (Factory New)',

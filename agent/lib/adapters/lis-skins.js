@@ -369,6 +369,10 @@ class LisSkinsAdapter {
     params.set('sort_by', SORT_BY);
     params.set('only_unlocked', String(ONLY_UNLOCKED));
 
+    if (batch.currency) {
+      params.set('currency', batch.currency);
+    }
+
     if (batch.maxPrice != null) {
       params.set('price_to', String(batch.maxPrice));
     }
@@ -386,9 +390,10 @@ class LisSkinsAdapter {
     context.throwIfStopped();
     await this.waitTurn();
     context.throwIfStopped();
-    this.logger.debug('lisSkins', 'HTTP request started.', {
+    this.logger.info('lisSkins', 'HTTP request sent.', {
       url,
-      names: batch.names.length,
+      names: batch.names.slice(),
+      currency: batch.currency || null,
       cursor: cursor || null,
       requestDelayMs: this.currentRequestDelayMs,
       maxPrice: batch.maxPrice,
@@ -420,11 +425,16 @@ class LisSkinsAdapter {
       throw createProviderError('LIS-SKINS search returned invalid JSON.', 'provider_error');
     }
 
-    this.logger.debug('lisSkins', 'HTTP request finished.', {
+    const responseItems = extractItems(payload);
+    const responseNextCursor = extractNextCursor(payload);
+    this.logger.info('lisSkins', 'HTTP response received.', {
       url,
       status: response.status,
       cursor: cursor || null,
-      names: batch.names.length
+      names: batch.names.length,
+      itemsReturned: responseItems.length,
+      nextCursor: responseNextCursor ? 'present' : 'none',
+      sampleItems: responseItems.slice(0, 3).map((item) => summarizeSearchItem(item))
     });
     this.logger.traceHttp('lisSkins', 'HTTP response payload.', buildResponseTraceDetails(url, response, payload));
 

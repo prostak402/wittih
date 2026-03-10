@@ -436,12 +436,11 @@
       return [];
     }
 
-    const lisBaseName = normalizeSkinBaseName(
-      applyUrlVariantLabel(
-        extractSkinBaseName(skin.url) || stripKnownQualitySuffix(skin.name || '') || skin.skinBaseName || skin.name,
-        skin.url
-      )
+    const rawBaseName = applyUrlVariantLabel(
+      extractSkinBaseName(skin.url) || stripKnownQualitySuffix(skin.name || '') || skin.skinBaseName || skin.name,
+      skin.url
     );
+    const lisBaseName = String(rawBaseName || '').replace(/\s+/g, ' ').trim() || null;
     return buildNamesForQualities(lisBaseName, profile && profile.qualities);
   }
 

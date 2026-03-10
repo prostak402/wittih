@@ -314,8 +314,8 @@ test('lis adapter includes URL phase variants in names[] search and matches star
   const fetchStub = createFetch((url, options) => {
     const parsedUrl = new URL(url);
     assert.deepEqual(parsedUrl.searchParams.getAll('names[]').sort(), [
-      'Karambit | Doppler (Phase 3) (Factory New)',
-      'Karambit | Doppler (Phase 3) (Minimal Wear)'
+      '\u2605 Karambit | Doppler (Phase 3) (Factory New)',
+      '\u2605 Karambit | Doppler (Phase 3) (Minimal Wear)'
     ]);
     assert.equal(options.headers.Authorization, 'Bearer test-token');
     return jsonResponse(200, {
